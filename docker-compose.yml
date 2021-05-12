@@ -1,0 +1,30 @@
+version: '3.2'
+services:
+  app:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    image: py_redis
+    container_name: py_redis_app
+    environment:
+      - DEBUG=true
+      - FLASK_DEBUG=1
+    depends_on:
+      - redis
+    ports: 
+        - 5000:5000
+    volumes:
+      - .:/app
+    
+  redis:
+    image: redis:6.2.3-alpine
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/redis.conf
+    command: [ "redis-server", "/redis.conf" ]
+volumes:
+  redis_data:
