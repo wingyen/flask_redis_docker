@@ -1,17 +1,19 @@
 from flask import Flask
-from .redis_resc import redis_conn
+from .redis_resc import redis_cache
 import redis
+import requests
+
 
 app = Flask(__name__)
-
-cache = redis.Redis(host='redis', port=6379)
 
 
 def get_hit_count():
     retries = 5
     while True:
         try:
-            return cache.incr('hits')
+            hits = redis_cache.incr('hits')
+            redis_cache.expire('hits', 60)
+            return hits
         except redis.exceptions.ConnectionError as exc:
             if retries == 0:
                 raise exc
@@ -23,3 +25,7 @@ def hello_world():
     count = get_hit_count()
 
     return 'Hello World! I have been seen {} times.\n'.format(count)
+
+
+def sub_random_joke():
+    pass
